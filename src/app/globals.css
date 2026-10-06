@@ -1,0 +1,461 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262 83% 58%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 5.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 263 70% 65%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 6% 82%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 263 70% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Rich multi-stop aurora background that drifts slowly — kept subtle so text stays readable */
+.gradient-bg {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, hsl(262 83% 58% / 0.18), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, hsl(199 89% 48% / 0.14), transparent 60%),
+    radial-gradient(800px 400px at 50% 110%, hsl(316 73% 52% / 0.12), transparent 60%),
+    hsl(240 10% 3.9%);
+}
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 55vmax;
+  height: 55vmax;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.3;
+  mix-blend-mode: screen;
+  animation: aurora-drift 22s ease-in-out infinite alternate;
+}
+
+.aurora::before {
+  background: radial-gradient(circle at 30% 30%, #8b5cf6 0%, transparent 60%);
+  top: -22vmax;
+  left: -12vmax;
+}
+
+.aurora::after {
+  background: radial-gradient(circle at 70% 70%, #06b6d4 0%, transparent 60%);
+  right: -16vmax;
+  bottom: -22vmax;
+  animation-delay: -11s;
+  animation-duration: 28s;
+}
+
+/* Vignette tint for extra contrast behind content */
+.aurora-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5vmax, -3vmax, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-4vmax, 4vmax, 0) scale(0.95);
+  }
+}
+
+/* Subtle grid overlay — a nod to on-chain / block aesthetic */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 100%);
+}
+
+.card-shine {
+  background:
+    linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(291 64% 42%) 50%, hsl(199 89% 48%) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--x, 50%) var(--y, 0%), rgba(255,255,255,0.18), transparent 40%);
+  pointer-events: none;
+}
+
+/* Glassmorphism card — darker base so text stays legible on bright backgrounds */
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(20, 20, 30, 0.72) 0%,
+    rgba(10, 10, 18, 0.78) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 20px 60px -20px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Rotating conic border — gives the main card a halo */
+.halo {
+  position: relative;
+  isolation: isolate;
+}
+.halo::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--halo-angle, 0deg),
+    #8b5cf6,
+    #d946ef,
+    #06b6d4,
+    #8b5cf6
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: halo-spin 8s linear infinite;
+  opacity: 0.9;
+  z-index: -1;
+}
+
+@property --halo-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes halo-spin {
+  to {
+    --halo-angle: 360deg;
+  }
+}
+
+/* Fallback animation when @property isn't supported */
+@supports not (background: paint(worklet)) {
+  .halo::before {
+    animation: halo-fallback 8s linear infinite;
+  }
+}
+@keyframes halo-fallback {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* Floating orbs */
+.orb {
+  border-radius: 9999px;
+  filter: blur(40px);
+  opacity: 0.6;
+  animation: orb-float 10s ease-in-out infinite alternate;
+}
+
+@keyframes orb-float {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(10px, -14px, 0) scale(1.08);
+  }
+}
+
+/* Shimmer across text or elements */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Entrance fade-up */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Tab content transition — snappy fade + slide */
+@keyframes tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+.tab-enter {
+  animation: tab-enter 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ----- Daily check-in celebration ----- */
+
+/* Confetti pop: each piece is translated outward via --dx/--dy, with rotation */
+@keyframes confetti-pop {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.6);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot, 720deg)) scale(1);
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: confetti-pop 1200ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Floating reward number */
+@keyframes reward-float {
+  0% {
+    transform: translate(-50%, -40%) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(-50%, -60%) scale(1.1);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(-50%, -140%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -200%) scale(0.95);
+    opacity: 0;
+  }
+}
+
+.reward-float {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  pointer-events: none;
+  animation: reward-float 1600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Button pop on claim */
+@keyframes claim-pop {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.04);
+  }
+  60% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.claim-pop {
+  animation: claim-pop 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Radial glow burst behind the button at claim time */
+@keyframes claim-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0;
+  }
+}
+.claim-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(217, 70, 239, 0.5) 0%,
+    rgba(139, 92, 246, 0.3) 30%,
+    transparent 70%
+  );
+  border-radius: 9999px;
+  animation: claim-burst 900ms ease-out forwards;
+}
+
+/* Flame icon shake on streak-up */
+@keyframes streak-wiggle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-12deg) scale(1.2);
+  }
+  50% {
+    transform: rotate(14deg) scale(1.25);
+  }
+  75% {
+    transform: rotate(-6deg) scale(1.15);
+  }
+}
+.streak-wiggle {
+  animation: streak-wiggle 700ms ease-in-out;
+  transform-origin: center bottom;
+}
+
+/* Pulse dot for live indicator */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+.pulse-dot {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
