@@ -1,4 +1,3 @@
-import axios from "axios";
 import { APP_NAME, APP_TOKEN_SYMBOL } from "@/lib/config";
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
@@ -11,14 +10,22 @@ function enabled(): boolean {
 async function send(text: string): Promise<void> {
   if (!enabled()) return;
   try {
-    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      chat_id: CHAT_ID,
-      text,
-      parse_mode: "HTML",
-      disable_web_page_preview: true,
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }),
     });
-  } catch {
-    console.error("[telegram] failed to send notification");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      console.error("[telegram] failed to send notification:", data);
+    }
+  } catch (error: any) {
+    console.error("[telegram] failed to send notification:", error.message);
   }
 }
 

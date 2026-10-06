@@ -1,5 +1,5 @@
 "use client";
-import { ethers } from "ethers";
+import { Wallet } from "ethers/wallet";
 
 const STORAGE_KEY = "scorp.wallet.v1";
 
@@ -12,7 +12,7 @@ export type LocalWallet = {
 
 export function importFromPrivateKey(pk: string): LocalWallet {
   const key = pk.trim();
-  const w = new ethers.Wallet(key.startsWith("0x") ? key : `0x${key}`);
+  const w = new Wallet(key.startsWith("0x") ? key : `0x${key}`);
   const client: LocalWallet = {
     address: w.address,
     privateKey: w.privateKey,
@@ -30,7 +30,7 @@ export function importFromPrivateKey(pk: string): LocalWallet {
 }
 
 export function importFromMnemonic(phrase: string): LocalWallet {
-  const w = ethers.Wallet.fromPhrase(phrase.trim());
+  const w = Wallet.fromPhrase(phrase.trim());
   const client: LocalWallet = {
     address: w.address,
     privateKey: w.privateKey,

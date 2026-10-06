@@ -1,23 +1,56 @@
 "use client";
-import axios from "axios";
 
-export const api = axios.create({
-  baseURL: "/api",
-  timeout: 15_000,
-  headers: { "Content-Type": "application/json" },
-});
+const BASE_URL = "/api";
+const TIMEOUT = 15_000;
 
-// Simple response-side normalizer so UI gets consistent error messages.
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    const msg =
-      err?.response?.data?.error ||
-      err?.message ||
-      "Network error. Please check your connection.";
-    return Promise.reject(new Error(msg));
+async function request<T>(
+  method: "GET" | "POST",
+  path: string,
+  opts?: { params?: Record<string, string>; body?: unknown }
+): Promise<T> {
+  let url = `${BASE_URL}${path}`;
+
+  if (opts?.params) {
+    const qs = new URLSearchParams(opts.params).toString();
+    if (qs) url += `?${qs}`;
   }
-);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT);
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: method === "POST" ? { "Content-Type": "application/json" } : undefined,
+      body: opts?.body ? JSON.stringify(opts.body) : undefined,
+      signal: controller.signal,
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data?.error || `Request failed (${res.status})`);
+    }
+
+    return data as T;
+  } catch (err: any) {
+    if (err.name === "AbortError") {
+      throw new Error("Request timed out. Please check your connection.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export const api = {
+  get<T>(path: string, opts?: { params?: Record<string, string> }) {
+    return request<T>("GET", path, opts).then((data) => ({ data }));
+  },
+  post<T>(path: string, body?: unknown) {
+    return request<T>("POST", path, body ? { body } : undefined).then((data) => ({ data }));
+  },
+};
 
 export type Challenge = {
   nonce: string;
@@ -32,7 +65,6 @@ export async function fetchChallenge(): Promise<Challenge> {
 }
 
 export async function solveChallenge(ch: Challenge): Promise<string> {
-  // Lightweight PoW: find a nonce whose sha256(nonce:solution) begins with N zeros.
   const target = "0".repeat(ch.difficulty);
   const enc = new TextEncoder();
   let i = 0;

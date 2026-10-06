@@ -437,6 +437,39 @@
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Respect reduced-motion: disable heavy GPU animations for low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  .aurora::before,
+  .aurora::after {
+    animation: none;
+  }
+  .halo::before {
+    animation: none;
+  }
+  .orb {
+    animation: none;
+  }
+  .shimmer-text {
+    animation: none;
+    color: rgba(255, 255, 255, 0.9);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+  }
+  .fade-up {
+    animation: none;
+    opacity: 1;
+  }
+  .tab-enter {
+    animation: none;
+    opacity: 1;
+  }
+  .confetti-piece {
+    animation: none;
+    display: none;
+  }
+}
+
 /* Hide number input spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
