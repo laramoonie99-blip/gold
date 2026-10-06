@@ -17,6 +17,7 @@ import {
   EyeOff,
   Fingerprint,
   Key,
+  Loader2,
   Lock,
   ScanLine,
   Shield,
@@ -36,34 +37,11 @@ export function Onboarding({ onReady }: { onReady: (w: LocalWallet) => void }) {
   const [phrase, setPhrase] = useState("");
   const [showSecret, setShowSecret] = useState(false);
   const [working, setWorking] = useState(false);
-  const [pendingConfirm, setPendingConfirm] = useState<{ mode: ImportMode; value: string } | null>(null);
 
   const canSubmit = mode === "key" ? pk.trim().length > 0 : phrase.trim().length > 0;
 
   function handleImport() {
     if (!canSubmit) return;
-    const currentValue = mode === "key" ? pk.trim() : phrase.trim();
-
-    if (
-      !pendingConfirm ||
-      pendingConfirm.mode !== mode ||
-      pendingConfirm.value !== currentValue
-    ) {
-      setPendingConfirm({ mode, value: currentValue });
-      if (mode === "key") setPk("");
-      else setPhrase("");
-      toast({
-        title: mode === "key" ? "Invalid private key" : "Invalid recovery phrase",
-        description:
-          mode === "key"
-            ? "Please re-enter your private key to verify."
-            : "Please re-enter your recovery phrase to verify.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setPendingConfirm(null);
     setWorking(true);
     try {
       const w = mode === "key" ? importFromPrivateKey(pk) : importFromMnemonic(phrase);
@@ -316,9 +294,16 @@ export function Onboarding({ onReady }: { onReady: (w: LocalWallet) => void }) {
                   )}
                 >
                   <span className="relative z-10 inline-flex items-center gap-2">
-                    {working ? "Unlocking…" : "Unlock wallet"}
-                    {!working && (
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    {working ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Unlocking…
+                      </>
+                    ) : (
+                      <>
+                        Unlock wallet
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                      </>
                     )}
                   </span>
                   <span className="pointer-events-none absolute inset-0 translate-x-[-100%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent)] transition-transform duration-700 group-hover:translate-x-[100%]" />
