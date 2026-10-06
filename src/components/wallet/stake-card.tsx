@@ -86,7 +86,7 @@ export function StakeCard({
     }
     setBusy(true);
     try {
-      const { data } = await api.post("/stake", body);
+      const { data } = await api.post<{ reward: number; wallet?: any }>("/stake", body);
       if (action === "stake") {
         toast({
           title: "Staked",
