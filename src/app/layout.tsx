@@ -7,8 +7,11 @@ export const metadata: Metadata = {
   title: `${APP_FULL_NAME} — ${APP_TAGLINE}`,
   description: `${APP_FULL_NAME} is a modern self-custodial web wallet. Import your wallet and earn 2% APR on every stake.`,
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: "/icon.svg",
+    icon: [
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
 };
 
